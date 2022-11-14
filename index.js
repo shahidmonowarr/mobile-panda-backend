@@ -17,10 +17,16 @@ const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology:
 async function run() {
     try{
         await client.connect();
-        console.log('database connected');
+        const serviceCollection = client.db("mobile_panda").collection("services");
+
+        app.get('/service', async (req, res) => {
+            const cursor = serviceCollection.find({});
+            const services = await cursor.toArray();
+            res.send(services);
+        });
     }
     finally{
-        await client.close();
+        
     }
 }run().catch(console.dir);
 
