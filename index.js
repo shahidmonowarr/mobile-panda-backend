@@ -38,7 +38,11 @@ async function run() {
             res.json(result);
         });
 
-        
+        app.get('/order', async (req, res) => {
+          const cursor = orderCollection.find({});
+          const orders = await cursor.toArray();
+          res.send(orders);
+      });
     }
     finally{}
 }run().catch(console.dir);
