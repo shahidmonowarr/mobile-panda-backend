@@ -22,6 +22,7 @@ async function run() {
     await client.connect();
     const serviceCollection = client.db("mobile_panda").collection("services");
     const orderCollection = client.db("mobile_panda").collection("orders");
+    const reviewCollection = client.db("mobile_panda").collection("reviews");
 
     app.get("/service", async (req, res) => {
       const cursor = serviceCollection.find({});
@@ -59,6 +60,12 @@ async function run() {
       const id = req.params.id;
       const query = { _id: ObjectId(id) };
       const result = await orderCollection.deleteOne(query);
+      res.json(result);
+    });
+
+    app.post("/review", async (req, res) => {
+      const review = req.body;
+      const result = await reviewCollection.insertOne(review);
       res.json(result);
     });
   } finally {
