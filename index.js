@@ -68,6 +68,12 @@ async function run() {
       const result = await reviewCollection.insertOne(review);
       res.json(result);
     });
+
+    app.get("/review", async (req, res) => {
+      const cursor = reviewCollection.find({});
+      const reviews = await cursor.toArray();
+      res.send(reviews);
+    });
   } finally {
   }
 }
