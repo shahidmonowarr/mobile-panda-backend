@@ -23,6 +23,19 @@ async function run() {
     const serviceCollection = client.db("mobile_panda").collection("services");
     const orderCollection = client.db("mobile_panda").collection("orders");
     const reviewCollection = client.db("mobile_panda").collection("reviews");
+    const userCollection = client.db("mobile_panda").collection("users");
+
+    app.put('/user/:email', async (req, res) => {
+      const email = req.params.email;
+      const user = req.body;
+      const filter = { email: email };
+      const options = { upsert: true };
+      const updateDoc = {
+        $set: user,
+      };
+      const result = await userCollection.updateOne(filter, updateDoc, options);
+      res.send(result);
+    })
 
     app.get("/service", async (req, res) => {
       const cursor = serviceCollection.find({});
