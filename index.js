@@ -46,16 +46,31 @@ async function run() {
       res.send(users);
     });
 
-    app.put('/user/admin/:email', async (req, res) => {
+    app.get('/admin/:email', async (req, res) => {
       const email = req.params.email;
-      const filter = { email: email };
+      const user = await userCollection.findOne({email: email});
+      const isAdmin = user.role === "admin";
+      res.send({admin: isAdmin});
+    });
+
+    // make admin
+    app.put('/user/admin/:email', verifyJWT, async (req, res) => {
+      const email = req.params.email;
+      const requester = req.decoded.email;
+      const requesterAccount = await userCollection.findOne({email: requester});
+      if(requesterAccount.role === "admin") {
+        const filter = { email: email };
       const updateDoc = {
         $set: {role: "admin"},
       };
       const result = await userCollection.updateOne(filter, updateDoc);
       res.send(result);
+      } else {
+        res.status(403).send({message: "forbidden access"});
+      }
     })
 
+    // make user 
     app.put('/user/:email', async (req, res) => {
       const email = req.params.email;
       const user = req.body;
@@ -69,12 +84,14 @@ async function run() {
       res.send({result, token});
     })
 
+    // get all services
     app.get("/service", async (req, res) => {
       const cursor = serviceCollection.find({});
       const services = await cursor.toArray();
       res.send(services);
     });
 
+    // get single service
     app.get("/service/:id", async (req, res) => {
       const id = req.params.id;
       const query = { _id: ObjectId(id) };
@@ -82,6 +99,7 @@ async function run() {
       res.send(service);
     });
 
+    // make order
     app.post("/order", async (req, res) => {
       const order = req.body;
       const result = await orderCollection.insertOne(order);
@@ -94,6 +112,7 @@ async function run() {
     //   res.send(orders);
     // });
 
+    // get order by email
     app.get("/order", verifyJWT, async (req, res) => {
       const email = req.decoded.email;
       const query = { email: email };
@@ -107,6 +126,7 @@ async function run() {
       }
     });
 
+    // delete order
     app.delete("/order/:id", async (req, res) => {
       const id = req.params.id;
       const query = { _id: ObjectId(id) };
@@ -114,12 +134,14 @@ async function run() {
       res.json(result);
     });
 
+    // add review
     app.post("/review", async (req, res) => {
       const review = req.body;
       const result = await reviewCollection.insertOne(review);
       res.json(result);
     });
 
+    // get all reviews
     app.get("/review", async (req, res) => {
       const cursor = reviewCollection.find({});
       const reviews = await cursor.toArray();
