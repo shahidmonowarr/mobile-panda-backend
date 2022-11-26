@@ -106,11 +106,13 @@ async function run() {
       res.json(result);
     });
 
-    // app.get("/order", async (req, res) => {
-    //   const cursor = orderCollection.find({});
-    //   const orders = await cursor.toArray();
-    //   res.send(orders);
-    // });
+    // get all orders
+    app.get('/order', async(req,res)=>{
+      const query ={}
+      const cursor = orderCollection.find(query)
+      const allOrder = await cursor.toArray()
+      res.send(allOrder)
+    })
 
     // get order by email
     app.get("/order", verifyJWT, async (req, res) => {
@@ -125,6 +127,38 @@ async function run() {
         res.status(403).send({message: "forbidden access"});
       }
     });
+
+    // get single order by id
+    app.get("/order/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: ObjectId(id) };
+      const result = await orderCollection.findOne(query);
+      res.send(result);
+    });
+
+    // for update
+    app.put('/order/:id', async (req, res) => {
+      const updateOrder = req.body[0];
+      const id = req.params.id;
+      // console.log(updateOrder);
+      const filter = { _id: ObjectId(id) };
+
+      const options = { upsert: true };
+
+      const updateDoc = {
+          $set: {
+              email: updateOrder.email,
+              price: updateOrder.price,
+              status: updateOrder.status,
+              description: updateOrder.description,
+              phone: updateOrder.phone
+          }
+      };
+      const result = await orderCollection.updateOne(filter, updateDoc, options);
+      // console.log(result);
+      res.send(result);
+  });
+
 
     // delete order
     app.delete("/order/:id", async (req, res) => {
