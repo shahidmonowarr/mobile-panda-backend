@@ -150,8 +150,7 @@ async function run() {
               email: updateOrder.email,
               price: updateOrder.price,
               status: updateOrder.status,
-              description: updateOrder.description,
-              phone: updateOrder.phone
+              description: updateOrder.description
           }
       };
       const result = await orderCollection.updateOne(filter, updateDoc, options);
