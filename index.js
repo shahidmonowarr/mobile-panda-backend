@@ -99,6 +99,14 @@ async function run() {
       res.send(service);
     });
 
+    // delete service
+    app.delete("/service/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: ObjectId(id) };
+      const result = await serviceCollection.deleteOne(query);
+      res.send(result);
+    });
+
     // make order
     app.post("/order", async (req, res) => {
       const order = req.body;
