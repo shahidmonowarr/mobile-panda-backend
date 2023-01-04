@@ -84,6 +84,14 @@ async function run() {
       res.send({result, token});
     })
 
+    // service api
+    // add service
+    app.post("/service", async (req, res) => {
+      const service = req.body;
+      const result = await serviceCollection.insertOne(service);
+      res.json(result);
+    });
+
     // get all services
     app.get("/service", async (req, res) => {
       const cursor = serviceCollection.find({});
